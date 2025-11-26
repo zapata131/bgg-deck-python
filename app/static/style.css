@@ -1,0 +1,141 @@
+:root {
+  --background: #F5F0E9;
+  --foreground: #3A3A3A;
+  --card: #FFFFFF;
+  --primary: #8367C7;
+  /* Purple */
+  --primary-foreground: #FFFFFF;
+  --muted: #F5F0E9;
+  --muted-foreground: #6B6B6B;
+  --radius: 0.625rem;
+}
+
+/* Poker Card Dimensions: 63.5mm x 88.9mm */
+.card-container {
+  width: 63.5mm;
+  height: 88.9mm;
+  border-radius: 3mm;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Print Overrides */
+@media print {
+  @page {
+    size: A4;
+    margin: 10mm;
+  }
+
+  body {
+    background: white;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  /* Grid Layout for Print */
+  .grid {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+    gap: 0 !important;
+    /* We handle spacing via padding in wrapper */
+  }
+
+  /* Wrapper handles the cut area/spacing */
+  .print-card-wrapper {
+    position: relative;
+    padding: 2mm;
+    /* Spacing between cut lines */
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* The Card Itself - Strict Dimensions */
+  .card-container {
+    width: 63.5mm !important;
+    height: 88.9mm !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    border: 0.5pt solid #ccc;
+    /* Faint guide line */
+    overflow: hidden !important;
+  }
+
+  /* Cut Markers (Crop Marks) */
+  .print-card-wrapper::before,
+  .print-card-wrapper::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  /* Horizontal Crop Marks */
+  .print-card-wrapper::before {
+    background:
+      linear-gradient(to right, black 3mm, transparent 3mm) top left,
+      linear-gradient(to left, black 3mm, transparent 3mm) top right,
+      linear-gradient(to right, black 3mm, transparent 3mm) bottom left,
+      linear-gradient(to left, black 3mm, transparent 3mm) bottom right;
+    background-size: 100% 0.5pt;
+    background-repeat: no-repeat;
+  }
+
+  /* Vertical Crop Marks */
+  .print-card-wrapper::after {
+    background:
+      linear-gradient(to bottom, black 3mm, transparent 3mm) top left,
+      linear-gradient(to bottom, black 3mm, transparent 3mm) top right,
+      linear-gradient(to top, black 3mm, transparent 3mm) bottom left,
+      linear-gradient(to top, black 3mm, transparent 3mm) bottom right;
+    background-size: 0.5pt 100%;
+    background-repeat: no-repeat;
+  }
+
+  /* Typography Scaling for Print */
+  .card-container h2 {
+    font-size: 10pt !important;
+    line-height: 1.1 !important;
+  }
+
+  .card-container p {
+    font-size: 7pt !important;
+    line-height: 1.2 !important;
+  }
+
+  .card-container .text-xs {
+    font-size: 6pt !important;
+  }
+
+  .card-container .text-\[10px\] {
+    font-size: 7pt !important;
+  }
+
+  .card-container .text-\[9px\] {
+    font-size: 6pt !important;
+  }
+
+  /* Adjust Stats Bar */
+  .card-container .h-\[12\%\] {
+    height: 10mm !important;
+    /* Fixed height for stats bar in print */
+  }
+
+  /* Adjust Image Area */
+  .card-container .h-\[60\%\] {
+    height: 53mm !important;
+    /* Fixed height for image in print (~60%) */
+  }
+}

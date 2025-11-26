@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "card_macro.html" import render_card %}
+
+{% block content %}
+<div class="container mx-auto">
+  <div class="flex justify-between items-center mb-6 no-print">
+    <h2 class="text-2xl font-bold text-[#8367C7]">Collection: {{ username }}</h2>
+    <button onclick="window.print()"
+      class="bg-[#8367C7] text-white py-2 px-4 rounded-md hover:bg-[#6a52a3] transition duration-200">
+      Print Cards
+    </button>
+    <form action="{{ url_for('main.download_pdf') }}" method="post" class="inline">
+      <input type="hidden" name="username" value="{{ username }}">
+      <button type="submit"
+        class="bg-[#3A3A3A] text-white py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200">
+        Download PDF
+      </button>
+    </form>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 print:grid-cols-3 print:gap-4">
+    {% for game in games %}
+    <div class="flex justify-center print-card-wrapper relative">
+      {{ render_card(game) }}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

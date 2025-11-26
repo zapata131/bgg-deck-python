@@ -1,0 +1,13 @@
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Login
+Authlib
+requests
+xmltodict
+beautifulsoup4
+playwright
+psycopg2-binary
+python-dotenv
+pytest
+pytest-mock

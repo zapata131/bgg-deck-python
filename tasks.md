@@ -1,0 +1,29 @@
+# Tasks
+
+- [ ] Project Initialization
+    - [ ] Create project directory structure
+    - [ ] Create `requirements.txt`
+    - [ ] Create `.env` template
+    - [ ] Initialize git repository
+- [ ] Backend Setup
+    - [ ] Create `app/__init__.py` (App factory)
+    - [ ] Create `config.py`
+    - [ ] Create `run.py`
+    - [ ] Create `app/models.py` (Database models)
+    - [ ] Create `app/auth.py` (Authentication logic)
+- [ ] Services Implementation
+    - [ ] Create `app/services/bgg.py` (BGG API & Scraper)
+    - [ ] Create `app/services/pdf.py` (PDF generation)
+- [ ] Frontend Setup
+    - [ ] Create `app/static/style.css`
+    - [ ] Create `app/templates/base.html`
+    - [ ] Create `app/templates/card_macro.html`
+    - [ ] Create `app/templates/index.html`
+- [ ] Routes Implementation
+    - [ ] Create `app/routes/__init__.py`
+    - [ ] Create `app/routes/main.py`
+    - [ ] Create `app/routes/api.py`
+- [ ] Verification
+    - [ ] Install dependencies
+    - [ ] Run migrations
+    - [ ] Start the server and verify basic functionality
