@@ -19,3 +19,11 @@
 
 ## Directory Structure
 See `README.md` or `FLASK_INSTRUCTIONS.md` for the detailed directory structure.
+
+## Branching Strategy
+We follow a **Feature Branch Workflow**:
+-   **`main`**: Production-ready code. No direct commits.
+-   **`feature/*`**: New features. Merge to `main` via PR/Merge.
+-   **`bugfix/*`**: Bug fixes. Merge to `main`.
+-   **`hotfix/*`**: Critical production fixes.
+See `BRANCHING_STRATEGY.md` for details.
