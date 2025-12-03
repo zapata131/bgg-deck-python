@@ -12,69 +12,96 @@ def inject_now():
 def index():
     return render_template('index.html')
 
-@main_bp.route('/collection', methods=['POST'])
+@main_bp.route('/collection', methods=['GET', 'POST'])
 def collection():
-    username = request.form.get('username')
+    if request.method == 'POST':
+        username = request.form.get('username')
+    else:
+        username = request.args.get('username')
+
+    if not username:
+        return redirect(url_for('main.index'))
+
     # 1. Fetch Collection
     data = fetch_collection(username)
     
     if data and data.get('status') == 202:
-        flash("BGG is processing the collection. Please try again in a few seconds.", "info")
-        return redirect(url_for('main.index'))
+        return render_template('processing.html', username=username)
 
     if not data or 'items' not in data or 'item' not in data['items']:
-        return "No games found or user does not exist", 404
+        flash(f"No games found for user '{username}' or user does not exist.", "error")
+        return redirect(url_for('main.index'))
         
-    # 2. Extract IDs (limit to 50)
-    # Handle case where 'item' is a single dict or list
+    # 2. Extract IDs
     items = data['items']['item']
     if isinstance(items, dict):
         items = [items]
         
-    games = items[:50] 
-    ids = [g['@objectid'] for g in games]
+    # Pagination Logic
+    page = request.args.get('page', 1, type=int)
+    per_page = 24 # 4x6 grid
+    total_items = len(items)
+    total_pages = (total_items + per_page - 1) // per_page
+    
+    start = (page - 1) * per_page
+    end = start + per_page
+    
+    current_items = items[start:end]
+    ids = [g['@objectid'] for g in current_items]
     
     # 3. Fetch Details
     details = fetch_things(ids)
     
     # 4. Process for Template
     processed_games = []
-    if details and 'item' in details['items']:
+    if details and 'items' in details and 'item' in details['items']:
         from app.services.bgg import process_games_data
         processed_games = process_games_data(details['items']['item'])
         
-    return render_template('collection.html', games=processed_games, username=username)
+    return render_template('collection.html', 
+                           games=processed_games, 
+                           username=username,
+                           page=page,
+                           total_pages=total_pages,
+                           total_items=total_items)
 
 @main_bp.route('/pdf', methods=['POST'])
 def download_pdf():
-    # Re-use collection logic or accept data. For simplicity, we'll re-fetch or expect IDs.
-    # But re-fetching is safer for now to ensure data consistency.
-    # Ideally, we should refactor the fetching logic into a reusable function.
-    
     username = request.form.get('username')
+    selected_ids_str = request.form.get('selected_ids')
+    
     if not username:
         return "Username required", 400
         
-    # Reuse the logic (copy-paste for now, refactor later if needed)
-    data = fetch_collection(username)
-    if not data or 'items' not in data or 'item' not in data['items']:
-        return "No games found", 404
-        
-    items = data['items']['item']
-    if isinstance(items, dict):
-        items = [items]
-    
-    games = items[:50]
-    ids = [g['@objectid'] for g in games]
+    ids = []
+    if selected_ids_str:
+        import json
+        try:
+            ids = json.loads(selected_ids_str)
+        except:
+            pass
+            
+    if not ids:
+        # Fallback: fetch first 50 if no selection (or handle as error)
+        # For now, let's just error if nothing selected to be safe, or fetch all?
+        # The UI enforces selection, so this is a fallback.
+        data = fetch_collection(username)
+        if not data or 'items' not in data or 'item' not in data['items']:
+            return "No games found", 404
+        items = data['items']['item']
+        if isinstance(items, dict):
+            items = [items]
+        ids = [g['@objectid'] for g in items[:50]]
+
+    # Fetch details for selected IDs
     details = fetch_things(ids)
     
     processed_games = []
-    if details and 'item' in details['items']:
+    if details and 'items' in details and 'item' in details['items']:
         from app.services.bgg import process_games_data
         processed_games = process_games_data(details['items']['item'])
 
     # Render template to string
-    # We need to inline CSS for Playwright to see it easily without a running server context
     import os
     from flask import current_app
     

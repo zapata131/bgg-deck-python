@@ -139,3 +139,8 @@
     /* Fixed height for image in print (~60%) */
   }
 }
+
+/* Keep checkbox visible if checked */
+.checkbox-wrapper:has(input:checked) {
+  opacity: 1 !important;
+}

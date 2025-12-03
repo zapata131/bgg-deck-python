@@ -2,28 +2,166 @@
 {% from "card_macro.html" import render_card %}
 
 {% block content %}
-<div class="container mx-auto">
-  <div class="flex justify-between items-center mb-6 no-print">
+<div class="flex flex-col md:flex-row justify-between items-center mb-6 no-print gap-4">
+  <div class="flex items-center gap-4">
     <h2 class="text-2xl font-bold text-[#8367C7]">Collection: {{ username }}</h2>
+    <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{{ games|length }} games</span>
+  </div>
+
+  <div class="flex gap-3">
+    <button onclick="toggleAll(true)" class="text-sm text-[#8367C7] hover:underline font-medium">Select All</button>
+    <span class="text-gray-300">|</span>
+    <button onclick="toggleAll(false)" class="text-sm text-gray-500 hover:underline">Deselect All</button>
+  </div>
+
+  <div class="flex gap-3">
     <button onclick="window.print()"
-      class="bg-[#8367C7] text-white py-2 px-4 rounded-md hover:bg-[#6a52a3] transition duration-200">
+      class="bg-[#8367C7] text-white py-2 px-4 rounded-lg hover:bg-[#6a52a3] transition duration-200 shadow-sm flex items-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+        </path>
+      </svg>
       Print Cards
     </button>
-    <form action="{{ url_for('main.download_pdf') }}" method="post" class="inline">
+    <form action="{{ url_for('main.download_pdf') }}" method="post" class="inline" id="pdf-form">
       <input type="hidden" name="username" value="{{ username }}">
-      <button type="submit"
-        class="bg-[#3A3A3A] text-white py-2 px-4 rounded-md hover:bg-gray-700 transition duration-200">
+      <!-- We will populate this with selected IDs before submit -->
+      <input type="hidden" name="selected_ids" id="selected_ids">
+      <button type="button" onclick="submitPdfForm()"
+        class="bg-[#3A3A3A] text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-200 shadow-sm flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+        </svg>
         Download PDF
       </button>
     </form>
   </div>
+</div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 print:grid-cols-3 print:gap-4">
-    {% for game in games %}
-    <div class="flex justify-center print-card-wrapper relative">
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 print:grid-cols-3 print:gap-4"
+  id="games-grid">
+  {% for game in games %}
+  <div class="game-card-wrapper group relative transition-all duration-200 hover:-translate-y-1"
+    data-id="{{ game.id }}">
+    <!-- Selection Checkbox -->
+    <div
+      class="absolute top-2 right-2 z-10 no-print opacity-0 group-hover:opacity-100 transition-opacity duration-200 checkbox-wrapper">
+      <input type="checkbox" class="game-checkbox w-5 h-5 text-[#8367C7] rounded border-gray-300 focus:ring-[#8367C7]"
+        checked>
+    </div>
+
+    <!-- Card Content -->
+    <div class="flex justify-center print-card-wrapper cursor-pointer" onclick="openModal('{{ game.id }}')">
       {{ render_card(game) }}
     </div>
-    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Pagination -->
+{% if total_pages > 1 %}
+<div class="flex justify-center items-center mt-8 gap-4 no-print">
+  {% if page > 1 %}
+  <a href="{{ url_for('main.collection', username=username, page=page-1) }}"
+    class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+    &larr; Previous
+  </a>
+  {% else %}
+  <span class="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-400 cursor-not-allowed">
+    &larr; Previous
+  </span>
+  {% endif %}
+
+  <span class="text-gray-600 font-medium">
+    Page {{ page }} of {{ total_pages }}
+  </span>
+
+  {% if page < total_pages %} <a href="{{ url_for('main.collection', username=username, page=page+1) }}"
+    class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+    Next &rarr;
+    </a>
+    {% else %}
+    <span class="px-4 py-2 bg-gray-100 border border-gray-200 rounded-lg text-gray-400 cursor-not-allowed">
+      Next &rarr;
+    </span>
+    {% endif %}
+</div>
+{% endif %}
+
+<!-- Card Modal -->
+<div id="card-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+  aria-modal="true">
+  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal()">
+    </div>
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+    <div
+      class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Card Details</h3>
+            <div class="mt-2" id="modal-content">
+              <!-- Content injected via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button"
+          class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#8367C7] sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+          onclick="closeModal()">
+          Close
+        </button>
+      </div>
+    </div>
   </div>
 </div>
+
+<script>
+  function toggleAll(checked) {
+    document.querySelectorAll('.game-checkbox').forEach(cb => cb.checked = checked);
+  }
+
+  function submitPdfForm() {
+    const selectedIds = Array.from(document.querySelectorAll('.game-checkbox:checked'))
+      .map(cb => cb.closest('.game-card-wrapper').dataset.id);
+
+    if (selectedIds.length === 0) {
+      alert('Please select at least one game.');
+      return;
+    }
+
+    document.getElementById('selected_ids').value = JSON.stringify(selectedIds);
+    document.getElementById('pdf-form').submit();
+  }
+
+  // Simple Modal Logic (In a real app, populate with data attributes or fetch)
+  // For now, we'll just clone the card into the modal
+  function openModal(gameId) {
+    // Prevent opening if clicking checkbox
+    if (event.target.type === 'checkbox') return;
+
+    const card = document.querySelector(`.game-card-wrapper[data-id="${gameId}"] .card-container`).cloneNode(true);
+    const modalContent = document.getElementById('modal-content');
+    modalContent.innerHTML = '';
+
+    // Scale up for better visibility
+    card.style.transform = 'scale(1.2)';
+    card.style.transformOrigin = 'top center';
+    card.style.margin = '0 auto 20px auto';
+
+    modalContent.appendChild(card);
+    document.getElementById('card-modal').classList.remove('hidden');
+  }
+
+  function closeModal() {
+    document.getElementById('card-modal').classList.add('hidden');
+  }
+
+  // Show checkboxes always if any are unchecked, or on hover
+  // Handled via CSS group-hover for now
+</script>
 {% endblock %}

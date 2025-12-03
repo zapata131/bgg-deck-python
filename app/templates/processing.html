@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex flex-col items-center justify-center min-h-[60vh] text-center">
+  <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+    <div class="mb-6">
+      <svg class="animate-spin h-12 w-12 text-[#8367C7] mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none"
+        viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+        </path>
+      </svg>
+    </div>
+
+    <h2 class="text-2xl font-bold text-gray-900 mb-2">Processing Collection</h2>
+    <p class="text-gray-600 mb-6">
+      BoardGameGeek is currently preparing the data for <strong>{{ username }}</strong>.
+      This usually takes a few seconds.
+    </p>
+
+    <form action="{{ url_for('main.collection') }}" method="post" id="retry-form">
+      <input type="hidden" name="username" value="{{ username }}">
+      <button type="submit" class="hidden">Retry</button>
+    </form>
+
+    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mb-4">
+      <div class="bg-[#8367C7] h-2.5 rounded-full" style="width: 100%" id="progress-bar"></div>
+    </div>
+
+    <p class="text-sm text-gray-400">Retrying in <span id="countdown">5</span> seconds...</p>
+  </div>
+</div>
+
+<script>
+  let seconds = 5;
+  const countdownEl = document.getElementById('countdown');
+  const form = document.getElementById('retry-form');
+
+  const interval = setInterval(() => {
+    seconds--;
+    countdownEl.textContent = seconds;
+
+    if (seconds <= 0) {
+      clearInterval(interval);
+      form.submit();
+    }
+  }, 1000);
+</script>
+{% endblock %}

@@ -1,6 +1,6 @@
 import pytest
 from app import create_app, db
-from app.models import User
+from app import create_app, db
 from config import Config
 
 class TestConfig(Config):

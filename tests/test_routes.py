@@ -60,14 +60,14 @@ def test_collection_success(mock_fetch_things, mock_fetch_collection, client):
 def test_collection_not_found(mock_fetch_collection, client):
     """Test collection not found."""
     mock_fetch_collection.return_value = None
-    response = client.post('/collection', data={'username': 'unknown'})
-    assert response.status_code == 404
+    response = client.post('/collection', data={'username': 'unknown'}, follow_redirects=True)
+    assert response.status_code == 200
     assert b"No games found" in response.data
 
 @patch('app.routes.main.fetch_collection')
 def test_collection_processing(mock_fetch_collection, client):
     """Test BGG processing (202)."""
     mock_fetch_collection.return_value = {'status': 202}
-    response = client.post('/collection', data={'username': 'processing'}, follow_redirects=True)
+    response = client.post('/collection', data={'username': 'processing'})
     assert response.status_code == 200
-    assert b"BGG is processing" in response.data
+    assert b"Processing Collection" in response.data

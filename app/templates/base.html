@@ -23,12 +23,8 @@
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold text-[#8367C7]">La Matatena</h1>
             <nav>
-                {% if current_user.is_authenticated %}
-                <span class="mr-4">Hello, {{ current_user.name }}</span>
-                <a href="{{ url_for('auth.logout') }}" class="text-sm hover:underline">Logout</a>
-                {% else %}
-                <a href="{{ url_for('auth.login') }}" class="text-sm hover:underline">Login with Google</a>
-                {% endif %}
+                <a href="https://boardgamegeek.com" target="_blank"
+                    class="text-sm hover:underline text-gray-600">BoardGameGeek</a>
             </nav>
         </div>
     </header>

@@ -1,29 +1,33 @@
 # Tasks
 
-- [ ] Project Initialization
-    - [ ] Create project directory structure
-    - [ ] Create `requirements.txt`
-    - [ ] Create `.env` template
-    - [ ] Initialize git repository
-- [ ] Backend Setup
-    - [ ] Create `app/__init__.py` (App factory)
-    - [ ] Create `config.py`
-    - [ ] Create `run.py`
-    - [ ] Create `app/models.py` (Database models)
-    - [ ] Create `app/auth.py` (Authentication logic)
-- [ ] Services Implementation
-    - [ ] Create `app/services/bgg.py` (BGG API & Scraper)
-    - [ ] Create `app/services/pdf.py` (PDF generation)
-- [ ] Frontend Setup
-    - [ ] Create `app/static/style.css`
-    - [ ] Create `app/templates/base.html`
-    - [ ] Create `app/templates/card_macro.html`
-    - [ ] Create `app/templates/index.html`
-- [ ] Routes Implementation
-    - [ ] Create `app/routes/__init__.py`
-    - [ ] Create `app/routes/main.py`
-    - [ ] Create `app/routes/api.py`
-- [ ] Verification
-    - [ ] Install dependencies
-    - [ ] Run migrations
-    - [ ] Start the server and verify basic functionality
+- [x] Project Initialization
+    - [x] Create project directory structure
+    - [x] Create `requirements.txt`
+    - [x] Create `.env` template
+    - [x] Initialize git repository
+- [x] Backend Setup
+    - [x] Create `app/__init__.py` (App factory)
+    - [x] Create `config.py`
+    - [x] Create `run.py`
+    - [x] Create `app/models.py` (Database models)
+    - [x] Create `app/auth.py` (Authentication logic)
+- [x] Services Implementation
+    - [x] Create `app/services/bgg.py` (BGG API & Scraper)
+    - [x] Create `app/services/pdf.py` (PDF generation)
+- [x] Frontend Setup
+    - [x] Create `app/static/style.css`
+    - [x] Create `app/templates/base.html`
+    - [x] Create `app/templates/card_macro.html`
+    - [x] Create `app/templates/index.html`
+- [x] Routes Implementation
+    - [x] Create `app/routes/__init__.py`
+    - [x] Create `app/routes/main.py`
+    - [x] Create `app/routes/api.py`
+- [x] Verification
+    - [x] Install dependencies
+    - [x] Run migrations
+    - [x] Start the server and verify basic functionality
+- [x] Optimization
+    - [x] Implement Parallel Processing for BGG fetch
+    - [x] Implement Database Caching
+    - [x] Handle BGG API limits (chunking)
