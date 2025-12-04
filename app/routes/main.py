@@ -66,32 +66,36 @@ def collection():
                            total_items=total_items)
 
 @main_bp.route('/pdf', methods=['POST'])
+@main_bp.route('/pdf', methods=['POST'])
 def download_pdf():
     username = request.form.get('username')
     selected_ids_str = request.form.get('selected_ids')
+    download_all = request.form.get('download_all') == 'true'
     
     if not username:
         return "Username required", 400
         
     ids = []
-    if selected_ids_str:
+    if not download_all and selected_ids_str:
         import json
         try:
             ids = json.loads(selected_ids_str)
         except:
             pass
             
-    if not ids:
-        # Fallback: fetch first 50 if no selection (or handle as error)
-        # For now, let's just error if nothing selected to be safe, or fetch all?
-        # The UI enforces selection, so this is a fallback.
+    if download_all or not ids:
+        # Fetch full collection if download_all is requested or as fallback
         data = fetch_collection(username)
         if not data or 'items' not in data or 'item' not in data['items']:
             return "No games found", 404
         items = data['items']['item']
         if isinstance(items, dict):
             items = [items]
-        ids = [g['@objectid'] for g in items[:50]]
+            
+        # If specific IDs were requested (and valid), use them. 
+        # Otherwise (download_all or fallback), use all IDs.
+        if not ids: 
+             ids = [g['@objectid'] for g in items]
 
     # Fetch details for selected IDs
     details = fetch_things(ids)
@@ -109,7 +113,14 @@ def download_pdf():
     with open(css_path, 'r') as f:
         css_content = f.read()
         
-    html_content = render_template('collection.html', games=processed_games, username=username, inline_css=css_content)
+    # Pass dummy pagination values as they are not needed for PDF (and hidden via CSS)
+    html_content = render_template('collection.html', 
+                                   games=processed_games, 
+                                   username=username, 
+                                   inline_css=css_content,
+                                   page=1,
+                                   total_pages=1,
+                                   total_items=len(processed_games))
     
     from app.services.pdf import generate_pdf
     from flask import make_response

@@ -26,15 +26,26 @@
     </button>
     <form action="{{ url_for('main.download_pdf') }}" method="post" class="inline" id="pdf-form">
       <input type="hidden" name="username" value="{{ username }}">
-      <!-- We will populate this with selected IDs before submit -->
       <input type="hidden" name="selected_ids" id="selected_ids">
-      <button type="button" onclick="submitPdfForm()"
+      <input type="hidden" name="download_all" id="download_all" value="false">
+
+      <button type="button" onclick="submitPdfForm(false)"
         class="bg-[#3A3A3A] text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-200 shadow-sm flex items-center gap-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
         </svg>
-        Download PDF
+        Download Selected
+      </button>
+
+      <button type="button" onclick="submitPdfForm(true)"
+        class="ml-2 bg-white text-[#8367C7] border border-[#8367C7] py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-200 shadow-sm flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+          </path>
+        </svg>
+        Download All
       </button>
     </form>
   </div>
@@ -125,16 +136,21 @@
     document.querySelectorAll('.game-checkbox').forEach(cb => cb.checked = checked);
   }
 
-  function submitPdfForm() {
-    const selectedIds = Array.from(document.querySelectorAll('.game-checkbox:checked'))
-      .map(cb => cb.closest('.game-card-wrapper').dataset.id);
+  function submitPdfForm(downloadAll) {
+    const downloadAllInput = document.getElementById('download_all');
+    downloadAllInput.value = downloadAll ? 'true' : 'false';
 
-    if (selectedIds.length === 0) {
-      alert('Please select at least one game.');
-      return;
+    if (!downloadAll) {
+      const selectedIds = Array.from(document.querySelectorAll('.game-checkbox:checked'))
+        .map(cb => cb.closest('.game-card-wrapper').dataset.id);
+
+      if (selectedIds.length === 0) {
+        alert('Please select at least one game.');
+        return;
+      }
+      document.getElementById('selected_ids').value = JSON.stringify(selectedIds);
     }
 
-    document.getElementById('selected_ids').value = JSON.stringify(selectedIds);
     document.getElementById('pdf-form').submit();
   }
 

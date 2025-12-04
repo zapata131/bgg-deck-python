@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #F5F0E9;
+    --foreground: #3A3A3A;
+    --card: #FFFFFF;
+    --primary: #8367C7;
+    --primary-foreground: #FFFFFF;
+    --muted: #F5F0E9;
+    --muted-foreground: #6B6B6B;
+    --radius: 0.625rem;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+/* Poker Card Dimensions: 63.5mm x 88.9mm */
+.card-container {
+  width: 63.5mm;
+  height: 88.9mm;
+  @apply rounded overflow-hidden relative flex flex-col bg-card shadow-sm;
+}

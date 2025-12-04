@@ -42,6 +42,14 @@ A web application to generate printable cards from a BoardGameGeek (BGG) collect
     ```
 3.  Open your browser and navigate to: [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
+### Running with Docker (Optional)
+1.  Build and start the container:
+    ```bash
+    docker-compose up --build
+    ```
+2.  Open your browser and navigate to: [http://localhost:5000](http://localhost:5000)
+
+
 ### How to Use
 1.  **Enter Username**: On the landing page, enter a BGG username (e.g., `zapata131` or `rahdo`).
 2.  **Wait for Processing**: If it's a large collection or the first fetch, you might see a "Processing" screen. Wait for it to complete.

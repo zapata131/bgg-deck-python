@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+      - /app/.venv
+    environment:
+      - FLASK_APP=run.py
+      - FLASK_ENV=development
+      # Add other environment variables here or use env_file
+    env_file:
+      - .env
