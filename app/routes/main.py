@@ -109,18 +109,23 @@ def download_pdf():
     import os
     from flask import current_app
     
-    css_path = os.path.join(current_app.root_path, 'static', 'style.css')
-    with open(css_path, 'r') as f:
-        css_content = f.read()
-        
-    # Pass dummy pagination values as they are not needed for PDF (and hidden via CSS)
-    html_content = render_template('collection.html', 
+    # We don't strictly need to pass inline CSS if we use WeasyPrint's stylesheets arg,
+    # but the layout expects it. Let's try to read the tailwind output.
+    css_path = os.path.join(current_app.static_folder, 'dist', 'output.css')
+    css_content = ""
+    if os.path.exists(css_path):
+        with open(css_path, 'r') as f:
+            css_content = f.read()
+    else:
+        # Fallback to style.css
+        legacy_css_path = os.path.join(current_app.static_folder, 'style.css')
+        if os.path.exists(legacy_css_path):
+            with open(legacy_css_path, 'r') as f:
+                css_content = f.read()
+
+    html_content = render_template('layouts/pdf.html', 
                                    games=processed_games, 
-                                   username=username, 
-                                   inline_css=css_content,
-                                   page=1,
-                                   total_pages=1,
-                                   total_items=len(processed_games))
+                                   css_content=css_content)
     
     from app.services.pdf import generate_pdf
     from flask import make_response

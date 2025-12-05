@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>BGG Deck PDF</title>
+  <!-- WeasyPrint requires absolute paths or file:// URIs for local assets if not served via HTTP -->
+  <!-- But typically with Flask-WeasyPrint or just WeasyPrint, we can inject CSS content directly -->
+  <!-- The spec says: Inject the CSS using a direct file path, NOT a <link> tag. -->
+  <style>
+    {
+        {
+        css_content | safe
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-white">
+  <div class="grid grid-cols-3 gap-0">
+    {% for game in games %}
+    <div class="print-card-wrapper">
+      {{ render_card(game) }}
+    </div>
+    {% endfor %}
+  </div>
+</body>
+
+</html>

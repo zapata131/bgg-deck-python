@@ -2,8 +2,12 @@
 
 ## 1. Executive Summary
 **Project Name:** La Matatena
-**Objective:** Build a Flask web application that allows users to log in, fetch their board game collection from BoardGameGeek (BGG), and generate a high-quality, printable PDF deck of cards representing their games.
-**Core Constraint:** The system must use **WeasyPrint** for PDF generation (not Playwright/Selenium) and **Tailwind CSS** (via CLI) for styling to ensure low resource usage.
+**Objective:** Build a Flask web application that allows users to log in, fetch
+their board game collection from BoardGameGeek (BGG), and generate a
+high-quality, printable PDF deck of cards representing their games.
+**Core Constraint:** The system must use **WeasyPrint** for PDF generation (not
+Playwright/Selenium) and **Tailwind CSS** (via CLI) for styling to ensure low
+resource usage.
 
 ### Technical Stack
 *   **Backend:** Python 3.11+, Flask.
@@ -57,7 +61,8 @@ bgg-deck-flask/
 *   Setup `tailwind.config.js` and Tailwind CLI watcher.
 
 ### Phase 2: Database & Authentication (Local)
-*   **User Model:** Inherit from `flask_login.UserMixin`. Fields: `id`, `email`, `name`, `password_hash`.
+*   **User Model:** Inherit from `flask_login.UserMixin`. Fields: `id`, `email`,
+    `name`, `password_hash`.
 *   **Auth:** Implement `LoginManager`, `register`, `login`, `logout` routes.
 
 ### Phase 3: The BGG Service (Data Layer)
@@ -79,8 +84,10 @@ bgg-deck-flask/
 This project follows a **Feature Branch Workflow**.
 
 ### Branches
-*   **`main`**: The source of truth. Contains production-ready code. Direct commits are discouraged.
-*   **`feature/*`**: Developing new features (e.g., `feature/user-auth`, `feature/pdf-export`). Branch off `main`, merge back via PR.
+*   **`main`**: The source of truth. Contains production-ready code. Direct
+    commits are discouraged.
+*   **`feature/*`**: Developing new features (e.g., `feature/user-auth`,
+    `feature/pdf-export`). Branch off `main`, merge back via PR.
 *   **`bugfix/*`**: Fixing bugs. Branch off `main`.
 *   **`hotfix/*`**: Critical fixes for production.
 

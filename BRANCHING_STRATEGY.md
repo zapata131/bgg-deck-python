@@ -6,17 +6,20 @@ This project follows a **Feature Branch Workflow**.
 
 ### `main`
 -   **Purpose**: The source of truth. Contains production-ready code.
--   **Protection**: Direct commits are discouraged; changes should come via merges from feature branches.
+-   **Protection**: Direct commits are discouraged; changes should come via
+    merges from feature branches.
 
 ### `feature/*`
 -   **Purpose**: Developing new features or enhancements.
--   **Naming Convention**: `feature/short-description` (e.g., `feature/user-auth`, `feature/pdf-export`).
+-   **Naming Convention**: `feature/short-description` (e.g.,
+    `feature/user-auth`, `feature/pdf-export`).
 -   **Source**: Branch off `main`.
 -   **Merge**: Merge back into `main` upon completion and verification.
 
 ### `bugfix/*`
 -   **Purpose**: Fixing bugs found during development or testing.
--   **Naming Convention**: `bugfix/short-description` (e.g., `bugfix/fetch-timeout`).
+-   **Naming Convention**: `bugfix/short-description` (e.g.,
+    `bugfix/fetch-timeout`).
 -   **Source**: Branch off `main` (or the relevant feature branch).
 -   **Merge**: Merge back into `main` (or the relevant feature branch).
 
