@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+{% from "components/card.html" import render_card %}
 
 <head>
   <meta charset="UTF-8">
@@ -17,9 +18,9 @@
 </head>
 
 <body class="bg-white">
-  <div class="grid grid-cols-3 gap-0">
+  <div class="flex flex-wrap content-start">
     {% for game in games %}
-    <div class="print-card-wrapper">
+    <div class="print-card-wrapper mb-0 mr-0" style="page-break-inside: avoid; break-inside: avoid;">
       {{ render_card(game) }}
     </div>
     {% endfor %}

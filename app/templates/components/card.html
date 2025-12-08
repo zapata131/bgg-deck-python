@@ -60,7 +60,7 @@
         <path d="m3 10 7-7" />
         <path d="m14 21 7-7" />
       </svg>
-      <span>{{ "%.1f"|format(game.averageweight|default(0)) }}</span>
+      <span>{{ "%.1f"|format(game.averageweight|default(0)|float) }}</span>
     </div>
   </div>
 

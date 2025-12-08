@@ -29,13 +29,13 @@
       <input type="hidden" name="selected_ids" id="selected_ids">
       <input type="hidden" name="download_all" id="download_all" value="false">
 
-      <button type="button" onclick="submitPdfForm(false)"
+      <button type="button" onclick="submitPdfForm(false)" id="download-selected-btn"
         class="bg-[#3A3A3A] text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-200 shadow-sm flex items-center gap-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
         </svg>
-        Download Selected
+        <span>Download Selected</span>
       </button>
 
       <button type="button" onclick="submitPdfForm(true)"
@@ -132,39 +132,78 @@
 </div>
 
 <script>
-  function toggleAll(checked) {
-    document.querySelectorAll('.game-checkbox').forEach(cb => cb.checked = checked);
+  // Initialize selection from localStorage or empty
+  const storageKey = `bgg_selection_${"{{ username }}"}`;
+  let selectedGames = new Set(JSON.parse(localStorage.getItem(storageKey) || '[]'));
+
+  // Update UI on load
+  function updateUI() {
+    // Update checkboxes on current page
+    document.querySelectorAll('.game-card-wrapper').forEach(wrapper => {
+      const id = wrapper.dataset.id;
+      const checkbox = wrapper.querySelector('.game-checkbox');
+      checkbox.checked = selectedGames.has(id);
+    });
+
+    // Update button text with count
+    const count = selectedGames.size;
+    const btnText = document.querySelector('#download-selected-btn span');
+    if (btnText) btnText.innerText = count > 0 ? `Download Selected (${count})` : 'Download Selected';
   }
+
+  // Toggle single game
+  function toggleGame(id, checked) {
+    if (checked) {
+      selectedGames.add(id);
+    } else {
+      selectedGames.delete(id);
+    }
+    localStorage.setItem(storageKey, JSON.stringify(Array.from(selectedGames)));
+    updateUI();
+  }
+
+  // Toggle all on current page
+  function toggleAll(checked) {
+    document.querySelectorAll('.game-card-wrapper').forEach(wrapper => {
+      const id = wrapper.dataset.id;
+      toggleGame(id, checked);
+    });
+  }
+
+  // Listen for checkbox changes
+  document.addEventListener('change', (e) => {
+    if (e.target.classList.contains('game-checkbox')) {
+      const wrapper = e.target.closest('.game-card-wrapper');
+      toggleGame(wrapper.dataset.id, e.target.checked);
+    }
+  });
 
   function submitPdfForm(downloadAll) {
     const downloadAllInput = document.getElementById('download_all');
     downloadAllInput.value = downloadAll ? 'true' : 'false';
 
     if (!downloadAll) {
-      const selectedIds = Array.from(document.querySelectorAll('.game-checkbox:checked'))
-        .map(cb => cb.closest('.game-card-wrapper').dataset.id);
+      // Use the Set from localStorage
+      const ids = Array.from(selectedGames);
 
-      if (selectedIds.length === 0) {
+      if (ids.length === 0) {
         alert('Please select at least one game.');
         return;
       }
-      document.getElementById('selected_ids').value = JSON.stringify(selectedIds);
+      document.getElementById('selected_ids').value = JSON.stringify(ids);
     }
 
     document.getElementById('pdf-form').submit();
   }
 
-  // Simple Modal Logic (In a real app, populate with data attributes or fetch)
-  // For now, we'll just clone the card into the modal
+  // Modal Logic
   function openModal(gameId) {
-    // Prevent opening if clicking checkbox
     if (event.target.type === 'checkbox') return;
 
     const card = document.querySelector(`.game-card-wrapper[data-id="${gameId}"] .card-container`).cloneNode(true);
     const modalContent = document.getElementById('modal-content');
     modalContent.innerHTML = '';
 
-    // Scale up for better visibility
     card.style.transform = 'scale(1.2)';
     card.style.transformOrigin = 'top center';
     card.style.margin = '0 auto 20px auto';
@@ -177,7 +216,7 @@
     document.getElementById('card-modal').classList.add('hidden');
   }
 
-  // Show checkboxes always if any are unchecked, or on hover
-  // Handled via CSS group-hover for now
+  // Initialize
+  document.addEventListener('DOMContentLoaded', updateUI);
 </script>
 {% endblock %}

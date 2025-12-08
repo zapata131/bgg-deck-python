@@ -22,9 +22,17 @@
     <header class="bg-white shadow-sm p-4 no-print">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold text-[#8367C7]">La Matatena</h1>
-            <nav>
-                <a href="https://boardgamegeek.com" target="_blank"
-                    class="text-sm hover:underline text-gray-600">BoardGameGeek</a>
+            <nav class="flex gap-4 items-center">
+                {% if current_user.is_authenticated %}
+                <span class="text-sm text-gray-600">Hello, {{ current_user.name or current_user.email }}</span>
+                <a href="{{ url_for('auth.logout') }}"
+                    class="text-sm font-medium text-[#8367C7] hover:underline">Logout</a>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}"
+                    class="text-sm font-medium text-gray-600 hover:text-[#8367C7]">Login</a>
+                <a href="{{ url_for('auth.register') }}"
+                    class="text-sm font-medium text-white bg-[#8367C7] px-3 py-1.5 rounded-lg hover:bg-[#6a52a3] transition-colors">Register</a>
+                {% endif %}
             </nav>
         </div>
     </header>
