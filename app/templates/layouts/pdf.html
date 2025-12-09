@@ -21,7 +21,7 @@
   <div class="flex flex-wrap content-start">
     {% for game in games %}
     <div class="print-card-wrapper mb-0 mr-0" style="page-break-inside: avoid; break-inside: avoid;">
-      {{ render_card(game) }}
+      {{ render_card(game, options) }}
     </div>
     {% endfor %}
   </div>
