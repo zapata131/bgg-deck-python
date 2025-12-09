@@ -7,7 +7,6 @@ collection.
 
 *   **Backend**: Flask (Python)
 *   **Database**: SQLite (Dev) / PostgreSQL (Prod) + SQLAlchemy
-*   **Auth**: Flask-Login + Werkzeug Security (Local Email/Password)
 *   **PDF Engine**: WeasyPrint (Python)
 *   **Frontend**: Jinja2 Templates + TailwindCSS (Standalone CLI)
 
@@ -43,11 +42,11 @@ collection.
     ```bash
     flask db upgrade
     ```
-    *Or in dev shell:* `db.create_all()`
 2.  Start the server:
     ```bash
-    flask run
+    python3 run.py
     ```
+    *(Note: You can also use `flask run`, but `python3 run.py` ensures the app factory is invoked correctly)*
 3.  Open your browser and navigate to: [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ### Running with Docker (Optional)
@@ -59,14 +58,12 @@ collection.
 
 
 ### How to Use
-1.  **Register/Login**: Create an account to save your data.
-2.  **Enter Username**: On the collection page, enter a BGG username (e.g.,
-    `zapata131`).
-3.  **Wait for Processing**: If it's a large collection or the first fetch, you
+1.  **Enter Username**: On the landing page, enter a BGG username (e.g., `zapata131`).
+2.  **Wait for Processing**: If it's a large collection or the first fetch, you
     might see a "Processing" status.
-4.  **Browse Collection**: Use the pagination controls to browse games.
-5.  **Select Games**: Click cards to select them (or use "Select All").
-6.  **Generate PDF**: Click "Download PDF" to get a printable file.
+3.  **Browse Collection**: Use the pagination controls to browse games.
+4.  **Select Games**: Click cards to select them (or use "Select All").
+5.  **Generate PDF**: Click "Download PDF" to get a printable file.
 
 ### Stopping the App
 - Press `Ctrl + C` in the terminal where the server is running.
