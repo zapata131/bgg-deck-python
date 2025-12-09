@@ -1,8 +1,7 @@
 Flask
 Flask-SQLAlchemy
 Flask-Migrate
-Flask-Login
-Authlib
+
 requests
 xmltodict
 beautifulsoup4

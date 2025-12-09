@@ -46,7 +46,8 @@ collection.
     ```bash
     python3 run.py
     ```
-    *(Note: You can also use `flask run`, but `python3 run.py` ensures the app factory is invoked correctly)*
+    *(Note: Ensure your virtual environment is active: `source .venv/bin/activate`)*
+    *(You can also use `flask run`, but `python3 run.py` ensures the app factory is invoked correctly)*
 3.  Open your browser and navigate to: [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ### Running with Docker (Optional)
