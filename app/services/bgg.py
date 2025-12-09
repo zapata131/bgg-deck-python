@@ -18,11 +18,10 @@ HEADERS = {
 def fetch_collection(username):
     """Fetches owned games for a user."""
     url = f"{BGG_API_BASE}/collection"
-    params = {
         "username": username,
         "own": 1,
+        "stats": 1,
         "excludesubtype": "boardgameexpansion"
-    }
     # print(f"DEBUG: Fetching collection for {username} from {url}")
     try:
         response = requests.get(url, params=params, headers=HEADERS)

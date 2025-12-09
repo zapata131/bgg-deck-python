@@ -110,12 +110,22 @@
     <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-medium">
       <tr>
         <th class="px-4 py-3 text-left w-10">Select</th>
-        <th class="px-4 py-3 text-left">Game</th>
+        <th class="px-4 py-3 text-left cursor-pointer hover:bg-gray-100" onclick="updateSort('name')">
+          Game {% if current_sort == 'name' %}{{ '↓' if current_order == 'asc' else '↑' }}{% endif %}
+        </th>
         <th class="px-4 py-3 text-left col-designer">Designer</th>
-        <th class="px-4 py-3 text-center col-year">Year</th>
-        <th class="px-4 py-3 text-center col-players">Players</th>
-        <th class="px-4 py-3 text-center col-time">Time</th>
-        <th class="px-4 py-3 text-center col-weight">Weight</th>
+        <th class="px-4 py-3 text-center cursor-pointer hover:bg-gray-100 col-year" onclick="updateSort('year')">
+          Year {% if current_sort == 'year' %}{{ '↓' if current_order == 'asc' else '↑' }}{% endif %}
+        </th>
+        <th class="px-4 py-3 text-center cursor-pointer hover:bg-gray-100 col-players" onclick="updateSort('players')">
+          Players {% if current_sort == 'players' %}{{ '↓' if current_order == 'asc' else '↑' }}{% endif %}
+        </th>
+        <th class="px-4 py-3 text-center cursor-pointer hover:bg-gray-100 col-time" onclick="updateSort('time')">
+          Time {% if current_sort == 'time' %}{{ '↓' if current_order == 'asc' else '↑' }}{% endif %}
+        </th>
+        <th class="px-4 py-3 text-center cursor-pointer hover:bg-gray-100 col-weight" onclick="updateSort('weight')">
+          Weight {% if current_sort == 'weight' %}{{ '↓' if current_order == 'asc' else '↑' }}{% endif %}
+        </th>
       </tr>
     </thead>
     <tbody class="divide-y divide-gray-200 text-sm text-gray-700">
@@ -397,6 +407,23 @@
 
   function closeModal() {
     document.getElementById('card-modal').classList.add('hidden');
+  }
+
+  function updateSort(key) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentSort = urlParams.get('sort') || 'name';
+    const currentOrder = urlParams.get('order') || 'asc';
+
+    let newOrder = 'asc';
+    if (key === currentSort && currentOrder === 'asc') {
+      newOrder = 'desc';
+    }
+
+    urlParams.set('sort', key);
+    urlParams.set('order', newOrder);
+    urlParams.set('page', 1); // Reset to page 1
+
+    window.location.search = urlParams.toString();
   }
 
   // Initialize

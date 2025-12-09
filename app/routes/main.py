@@ -38,6 +38,39 @@ def collection():
         items = [items]
         
     # Pagination Logic
+    # Sorting Logic (Before Pagination)
+    sort_by = request.args.get('sort', 'name') # Default to name
+    order = request.args.get('order', 'asc')
+    
+    def get_sort_key(item, key):
+        # Helper to safely extract values from BGG XML dict structure
+        try:
+            if key == 'name':
+                val = item.get('name', {}).get('#text', '')
+                return val.lower() if val else ''
+            elif key == 'year':
+                val = item.get('yearpublished', {}).get('#text', 0)
+                return int(val) if val else 0
+            elif key == 'players':
+                # stats -> @minplayers
+                val = item.get('stats', {}).get('@minplayers', 0)
+                return int(val) if val else 0
+            elif key == 'time':
+                # stats -> @playingtime
+                val = item.get('stats', {}).get('@playingtime', 0)
+                return int(val) if val else 0
+            elif key == 'weight':
+                # stats -> rating -> averageweight -> @value
+                rating = item.get('stats', {}).get('rating', {})
+                val = rating.get('averageweight', {}).get('@value', 0)
+                return float(val) if val else 0
+            return 0
+        except:
+            return 0
+
+    reverse = (order == 'desc')
+    items.sort(key=lambda x: get_sort_key(x, sort_by), reverse=reverse)
+
     page = request.args.get('page', 1, type=int)
     per_page = 24 # 4x6 grid
     total_items = len(items)
@@ -67,7 +100,9 @@ def collection():
                            page=page,
                            total_pages=total_pages,
                            total_items=total_items,
-                           all_ids=all_ids)
+                           all_ids=all_ids,
+                           current_sort=sort_by,
+                           current_order=order)
 
 @main_bp.route('/pdf', methods=['POST'])
 @main_bp.route('/pdf', methods=['POST'])
