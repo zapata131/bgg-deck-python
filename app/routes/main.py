@@ -49,6 +49,9 @@ def collection():
     current_items = items[start:end]
     ids = [g['@objectid'] for g in current_items]
     
+    # Global ID list for "Select All"
+    all_ids = [g['@objectid'] for g in items]
+    
     # 3. Fetch Details
     details = fetch_things(ids)
     
@@ -63,7 +66,8 @@ def collection():
                            username=username,
                            page=page,
                            total_pages=total_pages,
-                           total_items=total_items)
+                           total_items=total_items,
+                           all_ids=all_ids)
 
 @main_bp.route('/pdf', methods=['POST'])
 @main_bp.route('/pdf', methods=['POST'])
@@ -123,9 +127,17 @@ def download_pdf():
             with open(legacy_css_path, 'r') as f:
                 css_content = f.read()
 
+    # Card Content Options
+    options = {
+        'include_players': request.form.get('include_players') == 'on',
+        'include_time': request.form.get('include_time') == 'on',
+        'include_weight': request.form.get('include_weight') == 'on',
+    }
+
     html_content = render_template('layouts/pdf.html', 
                                    games=processed_games, 
-                                   css_content=css_content)
+                                   css_content=css_content,
+                                   options=options)
     
     from app.services.pdf import generate_pdf
     from flask import make_response

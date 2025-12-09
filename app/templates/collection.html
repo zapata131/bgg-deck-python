@@ -3,15 +3,44 @@
 
 {% block content %}
 <div class="flex flex-col md:flex-row justify-between items-center mb-6 no-print gap-4">
-  <div class="flex items-center gap-4">
-    <h2 class="text-2xl font-bold text-[#8367C7]">Collection: {{ username }}</h2>
-    <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{{ games|length }} games</span>
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center gap-4">
+      <h2 class="text-2xl font-bold text-[#8367C7]">Collection: {{ username }}</h2>
+      <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{{ total_items }} games</span>
+    </div>
+
+    <!-- View Toggle -->
+    <div class="flex gap-2 text-sm">
+      <button onclick="setView('list')" id="btn-view-list" class="font-bold text-[#8367C7]">List View</button>
+      <span class="text-gray-300">|</span>
+      <button onclick="setView('grid')" id="btn-view-grid" class="text-gray-500 hover:text-[#8367C7]">Grid View</button>
+    </div>
+
+    <!-- Card Options -->
+    <div class="flex gap-4 text-xs text-gray-600 mt-1">
+      <label class="flex items-center gap-1 cursor-pointer">
+        <input type="checkbox" checked onchange="updateOption('players', this.checked)"
+          class="rounded text-[#8367C7] focus:ring-[#8367C7]"> Players
+      </label>
+      <label class="flex items-center gap-1 cursor-pointer">
+        <input type="checkbox" checked onchange="updateOption('time', this.checked)"
+          class="rounded text-[#8367C7] focus:ring-[#8367C7]"> Time
+      </label>
+      <label class="flex items-center gap-1 cursor-pointer">
+        <input type="checkbox" checked onchange="updateOption('weight', this.checked)"
+          class="rounded text-[#8367C7] focus:ring-[#8367C7]"> Weight
+      </label>
+    </div>
   </div>
 
-  <div class="flex gap-3">
-    <button onclick="toggleAll(true)" class="text-sm text-[#8367C7] hover:underline font-medium">Select All</button>
-    <span class="text-gray-300">|</span>
-    <button onclick="toggleAll(false)" class="text-sm text-gray-500 hover:underline">Deselect All</button>
+  <div class="flex flex-col gap-1 items-end">
+    <div class="flex gap-2 text-sm">
+      <button onclick="toggleAll(true)" class="text-[#8367C7] hover:underline">Select Page</button>
+      <span class="text-gray-300">|</span>
+      <button onclick="toggleAll(false)" class="text-gray-500 hover:underline">Deselect Page</button>
+    </div>
+    <button onclick="selectAllCollection()" class="text-xs text-[#8367C7] hover:underline font-medium">Select All {{
+      total_items }} Games</button>
   </div>
 
   <div class="flex gap-3">
@@ -28,6 +57,10 @@
       <input type="hidden" name="username" value="{{ username }}">
       <input type="hidden" name="selected_ids" id="selected_ids">
       <input type="hidden" name="download_all" id="download_all" value="false">
+      <!-- Options -->
+      <input type="hidden" name="include_players" id="input_include_players" value="on">
+      <input type="hidden" name="include_time" id="input_include_time" value="on">
+      <input type="hidden" name="include_weight" id="input_include_weight" value="on">
 
       <button type="button" onclick="submitPdfForm(false)" id="download-selected-btn"
         class="bg-[#3A3A3A] text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-200 shadow-sm flex items-center gap-2">
@@ -39,7 +72,7 @@
       </button>
 
       <button type="button" onclick="submitPdfForm(true)"
-        class="ml-2 bg-white text-[#8367C7] border border-[#8367C7] py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-200 shadow-sm flex items-center gap-2">
+        class="hidden ml-2 bg-white text-[#8367C7] border border-[#8367C7] py-2 px-4 rounded-lg hover:bg-gray-50 transition duration-200 shadow-sm flex items-center gap-2">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
             d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
@@ -51,16 +84,16 @@
   </div>
 </div>
 
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 print:grid-cols-3 print:gap-4"
-  id="games-grid">
+<div
+  class="hidden grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 print:grid-cols-3 print:gap-4 view-container"
+  id="view-grid">
   {% for game in games %}
   <div class="game-card-wrapper group relative transition-all duration-200 hover:-translate-y-1"
     data-id="{{ game.id }}">
     <!-- Selection Checkbox -->
     <div
       class="absolute top-2 right-2 z-10 no-print opacity-0 group-hover:opacity-100 transition-opacity duration-200 checkbox-wrapper">
-      <input type="checkbox" class="game-checkbox w-5 h-5 text-[#8367C7] rounded border-gray-300 focus:ring-[#8367C7]"
-        checked>
+      <input type="checkbox" class="game-checkbox w-5 h-5 text-[#8367C7] rounded border-gray-300 focus:ring-[#8367C7]">
     </div>
 
     <!-- Card Content -->
@@ -69,6 +102,53 @@
     </div>
   </div>
   {% endfor %}
+</div>
+
+<!-- List View -->
+<div class="hidden view-container overflow-x-auto" id="view-list">
+  <table class="min-w-full bg-white border border-gray-200 shadow-sm rounded-lg overflow-hidden">
+    <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-medium">
+      <tr>
+        <th class="px-4 py-3 text-left w-10">Select</th>
+        <th class="px-4 py-3 text-left">Game</th>
+        <th class="px-4 py-3 text-center col-year">Year</th>
+        <th class="px-4 py-3 text-center col-players">Players</th>
+        <th class="px-4 py-3 text-center col-time">Time</th>
+        <th class="px-4 py-3 text-center col-weight">Weight</th>
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-200 text-sm text-gray-700">
+      {% for game in games %}
+      <tr class="hover:bg-gray-50 transition-colors game-card-wrapper" data-id="{{ game.id }}">
+        <td class="px-4 py-3">
+          <input type="checkbox"
+            class="game-checkbox w-4 h-4 text-[#8367C7] rounded border-gray-300 focus:ring-[#8367C7]">
+        </td>
+        <td class="px-4 py-3 font-medium text-gray-900">
+          <button onclick="openModal('{{ game.id }}')" class="hover:text-[#8367C7] hover:underline text-left">
+            {{ game.name }}
+          </button>
+          <!-- Small Card hidden for modal cloning; Using .hidden ensures it is not seen but exists in DOM -->
+          <div class="hidden card-source">
+            <div class="card-container">
+              {{ render_card(game) }}
+            </div>
+          </div>
+        </td>
+        <td class="px-4 py-3 text-center text-gray-500 col-year">{{ game.yearpublished }}</td>
+        <td class="px-4 py-3 text-center col-players">
+          {% if game.minplayers == game.maxplayers %}
+          {{ game.minplayers }}
+          {% else %}
+          {{ game.minplayers }}-{{ game.maxplayers }}
+          {% endif %}
+        </td>
+        <td class="px-4 py-3 text-center col-time">{{ game.playingtime }}m</td>
+        <td class="px-4 py-3 text-center col-weight">{{ "%.1f"|format(game.averageweight|default(0)|float) }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 
 <!-- Pagination -->
@@ -131,27 +211,97 @@
   </div>
 </div>
 
-<script>
-  // Initialize selection from localStorage or empty
-  const storageKey = `bgg_selection_${"{{ username }}"}`;
-  let selectedGames = new Set(JSON.parse(localStorage.getItem(storageKey) || '[]'));
+<script id="data-all-ids" type="application/json">
+  {{ all_ids | tojson }}
+</script>
 
-  // Update UI on load
+<script>
+  // Global Data
+  const allGameIds = JSON.parse(document.getElementById('data-all-ids').textContent);
+  const storageKey = `bgg_selection_` + "{{ username }}";
+  const viewKey = 'bgg_view_preference';
+
+  // State
+  let selectedGames = new Set(JSON.parse(localStorage.getItem(storageKey) || '[]'));
+  let currentView = localStorage.getItem(viewKey) || 'list';
+
+  function updateOption(name, checked) {
+    // 1. Update form inputs for PDF
+    document.getElementById(`input_include_${name}`).value = checked ? 'on' : 'off';
+
+    // 2. Toggle Table Columns
+    document.querySelectorAll(`.col-${name}`).forEach(el => {
+      if (checked) el.classList.remove('hidden');
+      else el.classList.add('hidden');
+    });
+
+    // 3. Toggle Card Info (both in grid and existing cards in list/modal)
+    // We target elements with specific classes inside the cards
+    // The specific classes `info-players`, `info-time`, `info-weight` must be added to card.html
+    document.querySelectorAll(`.info-${name}`).forEach(el => {
+      if (checked) el.classList.remove('hidden');
+      else el.classList.add('hidden');
+    });
+  }
+
+  // --- View Logic ---
+  function setView(mode) {
+    currentView = mode;
+    localStorage.setItem(viewKey, mode);
+
+    // Toggle Containers
+    // IMPORTANT: Grid is now `view-grid`, List is `view-list`.
+    // Default visibility in HTML is setup for Grid (class `grid`) but helper classes hide it.
+    // Wait, initially I added `hidden` to list view.
+    // If we want list default, we should check `currentView` immediately.
+
+    const gridEl = document.getElementById('view-grid');
+    const listEl = document.getElementById('view-list');
+
+    // Reset classes first (remove hidden, add hidden based on mode)
+    if (mode === 'grid') {
+      gridEl.classList.remove('hidden');
+      gridEl.classList.add('grid'); // Restore grid display
+      listEl.classList.add('hidden');
+    } else {
+      listEl.classList.remove('hidden');
+      gridEl.classList.add('hidden');
+      gridEl.classList.remove('grid'); // Hide grid
+    }
+
+    // Update Buttons
+    const btnGrid = document.getElementById('btn-view-grid');
+    const btnList = document.getElementById('btn-view-list');
+
+    if (mode === 'grid') {
+      btnGrid.classList.add('font-bold', 'text-[#8367C7]');
+      btnGrid.classList.remove('text-gray-500');
+      btnList.classList.remove('font-bold', 'text-[#8367C7]');
+      btnList.classList.add('text-gray-500');
+    } else {
+      btnList.classList.add('font-bold', 'text-[#8367C7]');
+      btnList.classList.remove('text-gray-500');
+      btnGrid.classList.remove('font-bold', 'text-[#8367C7]');
+      btnGrid.classList.add('text-gray-500');
+    }
+  }
+
+  // --- Selection Logic ---
+
   function updateUI() {
     // Update checkboxes on current page
     document.querySelectorAll('.game-card-wrapper').forEach(wrapper => {
       const id = wrapper.dataset.id;
       const checkbox = wrapper.querySelector('.game-checkbox');
-      checkbox.checked = selectedGames.has(id);
+      if (checkbox) checkbox.checked = selectedGames.has(id);
     });
 
-    // Update button text with count
+    // Update button text
     const count = selectedGames.size;
     const btnText = document.querySelector('#download-selected-btn span');
     if (btnText) btnText.innerText = count > 0 ? `Download Selected (${count})` : 'Download Selected';
   }
 
-  // Toggle single game
   function toggleGame(id, checked) {
     if (checked) {
       selectedGames.add(id);
@@ -162,19 +312,29 @@
     updateUI();
   }
 
-  // Toggle all on current page
   function toggleAll(checked) {
+    // Only toggle visible items on the current page
     document.querySelectorAll('.game-card-wrapper').forEach(wrapper => {
       const id = wrapper.dataset.id;
       toggleGame(id, checked);
     });
   }
 
-  // Listen for checkbox changes
+  function selectAllCollection() {
+    if (confirm(`Are you sure you want to select ALL ${allGameIds.length} games in the collection?`)) {
+      allGameIds.forEach(id => selectedGames.add(id));
+      localStorage.setItem(storageKey, JSON.stringify(Array.from(selectedGames)));
+      updateUI();
+    }
+  }
+
+  // Event Delegation for Checkboxes
   document.addEventListener('change', (e) => {
     if (e.target.classList.contains('game-checkbox')) {
       const wrapper = e.target.closest('.game-card-wrapper');
-      toggleGame(wrapper.dataset.id, e.target.checked);
+      if (wrapper) {
+        toggleGame(wrapper.dataset.id, e.target.checked);
+      }
     }
   });
 
@@ -183,30 +343,48 @@
     downloadAllInput.value = downloadAll ? 'true' : 'false';
 
     if (!downloadAll) {
-      // Use the Set from localStorage
       const ids = Array.from(selectedGames);
-
       if (ids.length === 0) {
         alert('Please select at least one game.');
         return;
       }
       document.getElementById('selected_ids').value = JSON.stringify(ids);
     }
-
     document.getElementById('pdf-form').submit();
   }
 
-  // Modal Logic
+  // --- Modal Logic ---
   function openModal(gameId) {
-    if (event.target.type === 'checkbox') return;
+    let cardSource = null;
 
-    const card = document.querySelector(`.game-card-wrapper[data-id="${gameId}"] .card-container`).cloneNode(true);
+    // Priority mechanism to find the card structure
+    // 1. Try to find the hidden 'card-source' in the list view (as we are likely in list view)
+    const listRow = document.querySelector(`#view-list .game-card-wrapper[data-id="${gameId}"]`);
+    if (listRow) {
+      cardSource = listRow.querySelector('.card-container');
+    }
+
+    // 2. If not found, try grid view
+    if (!cardSource) {
+      const gridCard = document.querySelector(`#view-grid .game-card-wrapper[data-id="${gameId}"] .card-container`);
+      if (gridCard) cardSource = gridCard;
+    }
+
+    if (!cardSource) return;
+
+    const card = cardSource.cloneNode(true);
     const modalContent = document.getElementById('modal-content');
     modalContent.innerHTML = '';
 
     card.style.transform = 'scale(1.2)';
     card.style.transformOrigin = 'top center';
     card.style.margin = '0 auto 20px auto';
+
+    // Ensure visibility (if source was hidden)
+    // The cloning copies styles/classes. If parent was .hidden, card itself is fine.
+    // But if we toggle classes like info-players, expected state is preserved? 
+    // Yes, cloneNode copies current state of DOM including classes modified by JS?
+    // Actually cloneNode copies attributes from HTML, but recent DOM changes to classes ARE copied.
 
     modalContent.appendChild(card);
     document.getElementById('card-modal').classList.remove('hidden');
@@ -217,6 +395,17 @@
   }
 
   // Initialize
-  document.addEventListener('DOMContentLoaded', updateUI);
+  document.addEventListener('DOMContentLoaded', () => {
+    setView(currentView);
+    updateUI();
+
+    // Initialize toggle states based on current checkbox values (if browser cached them)
+    // Or just run updateOption for each default?
+    // Let's force defaults from the checkboxes
+    ['players', 'time', 'weight'].forEach(name => {
+      const cb = document.querySelector(`input[onchange="updateOption('${name}', this.checked)"]`);
+      if (cb) updateOption(name, cb.checked);
+    });
+  });
 </script>
 {% endblock %}
