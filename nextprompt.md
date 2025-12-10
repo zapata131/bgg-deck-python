@@ -1,0 +1,5 @@
+- Remove the card view and only inlclude list view. Include a message that prompts the user to click on the name of the game to see the desig of the card.
+- Since we only have list view, include all the games in list view and not only 24.
+- When sorting by year or any other column, the page only sorts the current games. Correct it.
+- Make it more obvious that the name of the game is a link or clickable and that it allows you to see the card's design.
+- Instead of a select all link, include a checkbox in the top of the SELECT column to select all of them.
